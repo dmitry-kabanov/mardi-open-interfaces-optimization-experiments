@@ -154,4 +154,5 @@ Manifest.toml
 
 
 # Output directory with computational results
+_assets/
 _output/
