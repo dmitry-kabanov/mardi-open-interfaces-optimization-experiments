@@ -29,7 +29,7 @@ def start_experiment(args: argparse.Namespace) -> Path:
     params_str = "_".join(sorted_params)
 
     # 3. Construct the path
-    outdir = f"{timestamp}_{params_str}.inprogress"
+    outdir = Path(f"{timestamp}_{params_str}.inprogress")
     if hasattr(args, "outdir"):
         outdir = Path(args.outdir) / outdir
     else:
@@ -49,7 +49,7 @@ def start_experiment(args: argparse.Namespace) -> Path:
 
 def finish_experiment(outdir: Path) -> Path:
     if not outdir.name.endswith(".inprogress"):
-        raise RuntimeException(f"Cannot find outdir with name '{outdir}'")
+        raise RuntimeError(f"Cannot find outdir with name '{outdir}'")
 
     new_name = outdir.name.replace(".inprogress", "")
     new_path = outdir.with_name(new_name)
@@ -63,3 +63,5 @@ def finish_experiment(outdir: Path) -> Path:
         symlink_path.unlink()
 
     os.symlink(finalized_outdir.name, symlink_path)
+
+    return finalized_outdir
