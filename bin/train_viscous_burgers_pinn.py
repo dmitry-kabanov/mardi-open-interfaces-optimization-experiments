@@ -23,7 +23,8 @@ jax.config.update("jax_enable_x64", True)
 loss_trace: list[float] = []
 
 
-DEFAULT_GRADIENT_TOL = 1e-3
+DEFAULT_GRADIENT_TOL = "1e-3"
+DEFAULT_SEED = "42"
 
 
 def _parse_args():
@@ -43,7 +44,6 @@ def _parse_args():
     parser.add_argument(
         "--gtol",
         default=DEFAULT_GRADIENT_TOL,
-        type=float,
         help="Gradient tolerance in inf-norm for the stopping criterion",
     )
     parser.add_argument(
@@ -54,6 +54,11 @@ def _parse_args():
     )
     parser.add_argument(
         "--linesearch", help="Line-search strategy for Optim.jl optimizers"
+    )
+    parser.add_argument(
+        "--seed",
+        default=42,
+        help="Random seed for initialization of neural network parameters",
     )
     parser.add_argument(
         "--outdir",
@@ -101,7 +106,7 @@ def main():
     architecture = [2, 50, 1]
     architecture = [2, 20, 20, 20, 20, 20, 20, 20, 20, 1]
     architecture = [2, 21, 13, 8, 5, 3, 2, 1]
-    mlp = MLP(architecture, seed=42, split_key=args.split_key)
+    mlp = MLP(architecture, seed=int(args.seed), split_key=args.split_key)
     # misfit_loss = MisfitLoss(mlp, x_2d, y)
     # loss_fn = misfit_loss.loss
     eqloss = ViscousBurgersEquationLoss(mlp, given_t=t, given_x=x, nu=nu)
@@ -136,12 +141,13 @@ def main():
     # so we need to match options, to compare red apples to similarly red apples.
     method_name = args.opt
     options = {}
+    GTOL = float(args.gtol)
     if args.impl == "scipy_optimize":
         if args.opt == "L-BFGS":
             method_name = "L-BFGS-B"  # Suffix "-B" means "box constraints"
             options = {"ftol": 2.2204460492503131e-09}
         elif args.opt == "BFGS":
-            options = {"gtol": args.gtol}
+            options = {"gtol": GTOL}
         else:
             raise ValueError()
     elif args.impl == "optim_jl":
@@ -155,7 +161,7 @@ def main():
                 options["linesearch"] = args.linesearch
         elif args.opt == "BFGS":
             options = {
-                "g_abstol": args.gtol,
+                "g_abstol": GTOL,
                 "iterations": 30_000,
             }
             if hasattr(args, "linesearch"):
