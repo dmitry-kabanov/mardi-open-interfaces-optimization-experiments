@@ -182,11 +182,6 @@ def main():
     )
 
     # 3. Compute exact solution of the Burgers' equation
-    # Parameters are exactly those in exact.py's __main__ block:
-    #   x, dx = np.linspace(0, 2, 256, endpoint=False, retstep=True)
-    #   u0 = 0.5 - 0.25 * np.sin(np.pi * x)
-    #   nu = 0.01 / np.pi
-    #   tfinal = 2.0
     print("Computing exact solution...")
     x, dx_exact = np.linspace(0, 2, 256, endpoint=True, retstep=True)
     u0_exact = 0.5 - 0.25 * np.sin(np.pi * x)
