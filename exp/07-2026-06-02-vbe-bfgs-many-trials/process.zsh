@@ -7,4 +7,4 @@ python plot_grouped_losses.py
 python plot_predictions.py
 python plot_together_grouped_losses.py
 
-python table_statistics.py
+python table_statistics.py | python transform-latex-table.py
