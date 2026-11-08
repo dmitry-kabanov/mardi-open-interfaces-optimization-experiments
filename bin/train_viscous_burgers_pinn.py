@@ -148,7 +148,8 @@ def main():
     if args.impl.endswith("scipy_optimize"):
         if args.opt == "L-BFGS":
             method_name = "L-BFGS-B"  # Suffix "-B" means "box constraints"
-            options = {"ftol": 2.2204460492503131e-09}
+            # options = {"ftol": 2.2204460492503131e-09}
+            options = {"gtol": GTOL}
         elif args.opt == "BFGS":
             options = {"gtol": GTOL}
         else:
@@ -156,8 +157,12 @@ def main():
     elif args.impl == "optim_jl":
         if args.opt == "L-BFGS":
             method_name = "LBFGS"
+            # options = {
+            #     "f_abstol": 2.2204460492503131e-09,
+            #     "iterations": 30_000,
+            # }
             options = {
-                "f_abstol": 2.2204460492503131e-09,
+                "g_abstol": GTOL,
                 "iterations": 30_000,
             }
             if hasattr(args, "linesearch"):
