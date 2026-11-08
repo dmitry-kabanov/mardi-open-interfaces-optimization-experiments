@@ -17,6 +17,7 @@ from loss import (
 )
 from mlp import MLP
 from openinterfaces.interfaces.optim import Optim
+from raw_optim import RawOptim
 
 jax.config.update("jax_enable_x64", True)
 
@@ -31,15 +32,15 @@ def _parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--impl",
-        choices=["scipy_optimize", "optim_jl"],
+        choices=["scipy_optimize", "optim_jl", "raw_scipy_optimize"],
         default="scipy_optimize",
-        help="Which implementation from Open Interfaces to use",
+        help="What implementation to use",
     )
     parser.add_argument(
         "--opt",
         choices=["L-BFGS", "BFGS"],
         default="L-BFGS",
-        help="What optimization algorithm to use",
+        help="What optimization method to use",
     )
     parser.add_argument(
         "--gtol",
@@ -103,8 +104,6 @@ def main():
     # Viscosity coefficient for the viscous Burgers' equation.
     nu = 0.01 / np.pi
 
-    architecture = [2, 50, 1]
-    architecture = [2, 20, 20, 20, 20, 20, 20, 20, 20, 1]
     architecture = [2, 21, 13, 8, 5, 3, 2, 1]
     mlp = MLP(architecture, seed=int(args.seed), split_key=args.split_key)
     # misfit_loss = MisfitLoss(mlp, x_2d, y)
@@ -123,7 +122,11 @@ def main():
         [grad_eqloss_fn, grad_icloss_fn, grad_bcloss_fn]
     )
 
-    s = Optim(args.impl)
+    if args.impl == "raw_scipy_optimize":
+        s = RawOptim()
+    else:
+        s = Optim(args.impl)
+
     s.set_initial_guess(np.asarray(mlp.theta, dtype=np.float64))
     s.set_objective_fn(wrapper_loss_fn)
     s.set_grad_fn(wrapper_grad_fn)
@@ -142,7 +145,7 @@ def main():
     method_name = args.opt
     options = {}
     GTOL = float(args.gtol)
-    if args.impl == "scipy_optimize":
+    if args.impl.endswith("scipy_optimize"):
         if args.opt == "L-BFGS":
             method_name = "L-BFGS-B"  # Suffix "-B" means "box constraints"
             options = {"ftol": 2.2204460492503131e-09}
