@@ -1,0 +1,20 @@
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - pytest
+  - python-dotenv
+  - numpy=2.2
+  - scipy=1.15
+  - matplotlib
+  - cmake
+  - c-compiler
+  - cxx-compiler
+  - mkl
+  - openblas
+  - gtest
+  - pip
+  - ca-certificates
+  - openssl
+  - jax
+  - pandas
