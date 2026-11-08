@@ -12,6 +12,15 @@ class RawOptim:
     def set_objective_fn(self, objective_fn):
         self.objective_fn = objective_fn
 
+        x = np.random.random(size=(self.N,))
+        msg = "Wrong signature for the objective function: "
+        msg += "expected return value must be of `float64` type"
+
+        assert type(self.objective_fn(x, self.user_data)) in [
+            float,
+            np.float64,
+        ], msg
+
     def set_grad_fn(self, grad_fn):
         self.grad_fn = grad_fn
 
