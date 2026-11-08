@@ -12,7 +12,7 @@ class RawOptim:
     def set_objective_fn(self, objective_fn):
         self.objective_fn = objective_fn
 
-        x = np.random.random(size=(self.N,))
+        x = np.random.random(size=(len(self.x0),))
         msg = "Wrong signature for the objective function: "
         msg += "expected return value must be of `float64` type"
 
