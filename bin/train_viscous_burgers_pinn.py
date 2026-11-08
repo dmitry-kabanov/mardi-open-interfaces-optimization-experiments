@@ -148,8 +148,7 @@ def main():
     if args.impl.endswith("scipy_optimize"):
         if args.opt == "L-BFGS":
             method_name = "L-BFGS-B"  # Suffix "-B" means "box constraints"
-            # options = {"ftol": 2.2204460492503131e-09}
-            options = {"gtol": GTOL}
+            options = {"ftol": 1e-12, "gtol": GTOL}
         elif args.opt == "BFGS":
             options = {"gtol": GTOL}
         else:
