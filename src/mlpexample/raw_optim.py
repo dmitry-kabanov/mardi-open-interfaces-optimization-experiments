@@ -8,6 +8,7 @@ class RawOptim:
 
     def set_initial_guess(self, x0):
         self.x0 = x0
+        self.x = np.empty_like(self.x0)
 
     def set_objective_fn(self, objective_fn):
         self.objective_fn = objective_fn
@@ -25,6 +26,23 @@ class RawOptim:
         self.grad_fn = grad_fn
 
     def set_method(self, method_name, method_params):
+        available_options = optimize.show_options(
+            "minimize", method=method_name, disp=False
+        )
+
+        for k in method_params.keys():
+            candidates = [f"\n{k} :", f"\n{k},"]
+            found = False
+            for c in candidates:
+                if c in available_options:
+                    found = True
+                    break
+
+            if not found:
+                raise ValueError(
+                    f"Method option '{k}' is not known for the method '{method_name}'"
+                )
+
         self.method_name = method_name
         self.method_params = method_params
 
@@ -40,7 +58,7 @@ class RawOptim:
             options=self.method_params,
         )
 
-        self.x = result.x.copy()
+        self.x[:] = result.x
         print(result)
         if hasattr(result, "jac"):
             print("|∇f(x*)|_∞ = ", np.linalg.norm(result.jac, np.inf))
