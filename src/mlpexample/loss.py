@@ -46,7 +46,7 @@ class ViscousBurgersEquationLoss:
         self.X = jnp.column_stack((t_mesh.ravel(), x_mesh.ravel()))
 
     def loss(self, theta):
-        self.u.theta = theta
+        # self.u.theta = theta
         """Compute mean squared error of the equation operator"""
 
         # Define u as a pure function of (t, x) → scalar, with theta fixed
