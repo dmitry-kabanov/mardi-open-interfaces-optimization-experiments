@@ -1,0 +1,9 @@
+{
+    "impl": "raw_scipy_optimize",
+    "opt": "BFGS",
+    "gtol": "1e-3",
+    "split_key": true,
+    "linesearch": null,
+    "seed": "1",
+    "outdir": "_outdir"
+}
