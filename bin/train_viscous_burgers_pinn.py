@@ -66,6 +66,16 @@ def _parse_args():
         default="_output",
         help="Path to the dir, in which the results subdir will be created",
     )
+    parser.add_argument(
+        "--jit",
+        action="store_true",
+        help="Apply jax.jit to loss and gradient functions",
+    )
+    parser.add_argument(
+        "--warmup",
+        action="store_true",
+        help="Invoke loss and gradient functions before measuring runtime",
+    )
     return parser.parse_args()
 
 
@@ -108,19 +118,38 @@ def main():
     mlp = MLP(architecture, seed=int(args.seed), split_key=args.split_key)
     # misfit_loss = MisfitLoss(mlp, x_2d, y)
     # loss_fn = misfit_loss.loss
-    eqloss = ViscousBurgersEquationLoss(mlp, given_t=t, given_x=x, nu=nu)
-    eqloss_fn = eqloss.loss
-    grad_eqloss_fn = jax.grad(eqloss_fn)
-    icloss = InitialConditionLoss(mlp, t0, x)
-    icloss_fn = icloss.loss
-    grad_icloss_fn = jax.grad(icloss_fn)
-    bcloss = PeriodicBoundaryConditionLoss(mlp, t, xleft, xright)
-    bcloss_fn = bcloss.loss
-    grad_bcloss_fn = jax.grad(bcloss_fn)
+    if args.jit:
+        eqloss = ViscousBurgersEquationLoss(mlp, given_t=t, given_x=x, nu=nu)
+        eqloss_fn = jax.jit(eqloss.loss)
+        grad_eqloss_fn = jax.jit(jax.grad(eqloss.loss))
+        icloss = InitialConditionLoss(mlp, t0, x)
+        icloss_fn = jax.jit(icloss.loss)
+        grad_icloss_fn = jax.jit(jax.grad(icloss.loss))
+        bcloss = PeriodicBoundaryConditionLoss(mlp, t, xleft, xright)
+        bcloss_fn = jax.jit(bcloss.loss)
+        grad_bcloss_fn = jax.jit(jax.grad(bcloss.loss))
+    else:
+        eqloss = ViscousBurgersEquationLoss(mlp, given_t=t, given_x=x, nu=nu)
+        eqloss_fn = eqloss.loss
+        grad_eqloss_fn = jax.grad(eqloss_fn)
+        icloss = InitialConditionLoss(mlp, t0, x)
+        icloss_fn = icloss.loss
+        grad_icloss_fn = jax.grad(icloss_fn)
+        bcloss = PeriodicBoundaryConditionLoss(mlp, t, xleft, xright)
+        bcloss_fn = bcloss.loss
+        grad_bcloss_fn = jax.grad(bcloss_fn)
+
     wrapper_loss_fn = get_wrapper_loss_fn([eqloss_fn, icloss_fn, bcloss_fn])
     wrapper_grad_fn = get_wrapper_grad_fn(
         [grad_eqloss_fn, grad_icloss_fn, grad_bcloss_fn]
     )
+
+    # Invoke loss and gradient functions
+    # so that JAX does it optimizations
+    # before measuring the runtime of optimization.
+    if args.warmup:
+        wrapper_loss_fn(np.zeros_like(mlp.theta), None)
+        wrapper_grad_fn(np.zeros_like(mlp.theta), np.empty_like(mlp.theta), None)
 
     if args.impl == "raw_scipy_optimize":
         s = RawOptim()
