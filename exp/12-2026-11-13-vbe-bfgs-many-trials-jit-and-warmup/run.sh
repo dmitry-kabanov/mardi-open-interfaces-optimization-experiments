@@ -3,6 +3,9 @@ export JAX_PLATFORMS=cpu
 export OUTDIR_ROOT=_output
 export SCRIPT=../../bin/train_viscous_burgers_pinn.py
 
+echo "USER = ${USER}"
+echo "python = $(which python)"
+
 mkdir -p "${OUTDIR_ROOT}"
 
 SCIPY=scipy_optimize
