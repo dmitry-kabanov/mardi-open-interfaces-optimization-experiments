@@ -1,9 +1,0 @@
-[dispatch] Configuration file: /home/dima/Work/um02-open-interfaces/lang_julia/_impl/optim/optim_jl/optim_jl.conf
-[dispatch] Backend name: julia
-[dispatch] Implementation details: 'optim/optim_jl/optim_jl.jl OptimJl'
-[bridge_julia] Provided module filename: 'optim/optim_jl/optim_jl.jl'
-[bridge_julia] Provided module name: 'OptimJl'
-[bridge_julia] Found module file '/home/dima/Work/um02-open-interfaces/lang_julia/_impl/optim/optim_jl/optim_jl.jl'
-[optim::optim_jl] To check available configuration options, see https://julianlsolvers.github.io/Optim.jl/stable/user/config/
-method_options = Dict{Any, Any}(:linesearch => LineSearches.StrongWolfe{Float64}(0.0001, 0.9, 2.0, nothing))
-general_options = Dict{Any, Any}(:iterations => 30000, :g_abstol => 0.0001)
