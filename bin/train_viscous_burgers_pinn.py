@@ -208,6 +208,19 @@ def main():
         raise ValueError()
     s.set_method(method_name, options)
 
+    # Warmup of the minimizer: this is mostly necessary for Julia
+    # because it has precompilations that severely skew the results.
+    if args.impl.endswith("scipy_optimize"):
+        options["gtol"] = 1e-1
+        s.minimize()
+        options["gtol"] = GTOL
+    elif args.impl == "optim_jl":
+        options["g_abstol"] = 1e-1
+        s.minimize()
+        options["g_abstol"] = GTOL
+    else:
+        raise ValueError()
+
     tic = time.perf_counter()
     status, message = s.minimize()
     toc = time.perf_counter()
