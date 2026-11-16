@@ -21,12 +21,5 @@ if (ulimit -e >/dev/null 2>&1); then
     fi
 fi
 
-# Run two experiments.
-# `nice -n -15` sets the process to high priority
-# `taskset -c 0-7` does core binding to avoid swapping threads
-
-cd exp/12-2026-11-13-vbe-bfgs-many-trials-jit-and-warmup &&
-    nice -n -15 taskset -c 0-7 zsh run.sh
-
-cd exp/13-2026-11-13-vbe-bfgs-many-trials-jit-and-warmup-raw &&
+cd exp/15-2026-11-15-vbe-all-together &&
     nice -n -15 taskset -c 0-7 zsh run.sh
